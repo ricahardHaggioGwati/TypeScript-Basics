@@ -30,7 +30,13 @@ type Numeric = number | boolean;
 type Universal = Combinable & Numeric; // within this context the intersection will be number, thats the type Universal will adopt
 
 // Type Guards help us with vheck whether we have recieved the correct type
-
+			//Function overload
+			// Here we infer type to all the possible outcomes so that we may recieve the desired data type
+function sum(a: number, b: number): number
+function sum(a: number, b: string): string
+function sum(a: string, b: string): string
+function sum(a: string, b: number): string
+			
 function sum(a: Combinable, b: Combinable) {
 	if (typeof a === 'string' || typeof b === 'string') {
 		// this is our type guard insuring we recieve the correct type during runtime
@@ -38,6 +44,9 @@ function sum(a: Combinable, b: Combinable) {
 	}
 	return a + b;
 }
+
+const result = sum('🥪', '🌮')		// I will try to put more unicode values :smile:
+result.split(' ')
 
 // Different type of type guard using the in keyword
 
@@ -124,4 +133,48 @@ if (userInputElement) {
 	(userInputElement as HTMLInputElement).value = 'Hi there'; // ALTR TO THE (!)
 }
 
+// Type
+
+
+
+
+
 // Index types
+ // In a case wher by we don'y kmpw how many properties we will need, we can use the index type
+ 
+interface ErrorHandler {
+	// id: string				// we can hard code a proprty within the handler but it should be the same type as the prop		
+	 [prop: string]: string		// Deaclaring an "unlimited" number of props that can be added
+}
+ 
+const errorBug: ErrorHandler = {
+	email: "not valid",
+	username: 'user already exists',
+	1: '404'					// Any input that can be converted to a string is allowed
+}
+
+// Function Overload
+
+// Can help infer what type typescript will recieve after proccessing the information provide: see sum function line 31
+
+
+// Optional changing
+// this method is ued to check whether some data recieved actually exists within a Http request or a object
+
+const fetchedData = {
+	id: 'u1',
+	name: 'Steve',
+	job: {
+		title: 'Avator',
+		position: "🎮"
+	}
+}
+
+console.log(fetchedData?.job?.position)		// The (?) is the optional parameter checking if fetchedData has a job prop and if that has a position prop
+
+// Nullish Coalescing
+
+const input = ''
+
+const storedData = input ?? 'Something_else'	// if input has the value of either null or undefined, then something else will be used
+//const storedData = input || 'Something_else'	// if input is a falsy vale e.g '' then something else will be used 
