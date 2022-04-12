@@ -1,10 +1,10 @@
-# TypeScript Classes and Interfaces
+# TypeScript Basics
 
 Moving forward wit the TypeScript train 🚋
 
 ## Description
 
-An overview into classes and interfaces served by yours truly in the best fasion I know how.
+An overview into basics served by yours truly in the best fasion I know how.
 
 ## Getting Started
 
