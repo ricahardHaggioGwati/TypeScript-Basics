@@ -64,7 +64,7 @@ extractAndConvert({ name: 'steve' }, 'name')
 
 // Generic class
 
-class DataStorage<T> {          // will only work with primitive values
+class DataStorage<T extends string | number | boolean> {          // will only work with primitive values
     private data: T[] = []      // will isnure that the data passed in is uniform
 
     addItem(item: T) {
@@ -86,3 +86,32 @@ textStorage.addItem('Dave')
 textStorage.addItem('Shawn')
 textStorage.removeItem('Shawn')
 console.log(textStorage.getItems())
+
+// Built in types with Utilities
+
+//Partial type
+interface CourseGoal {
+	title: string
+	discription: string
+	completeUntil: Date
+}
+
+function CreateCourseGoal(title: string, discription: string, date: Date): CourseGoal {
+	// return {title: title, discription: discription, completeUntil: date}
+	let courseGoal: Partial<CourseGoal> = {}
+	// Partial raps arround the CourseGoal, all of the properties will become optionally, essentially removing the errors
+	//Just in case they is extra validation
+
+	courseGoal.title = title
+	courseGoal.discription = discription
+	courseGoal.completeUntil = date
+	
+	return courseGoal as CourseGoal		// Returning won't work as the value will still be a Partial type until its casted
+}
+
+// Readonly Type
+
+const people: Readonly<string[]> = ['Dave', 'Steve']
+ // people.push('John')		This would yield an error
+
+// TODO: check for more utilities https://www.typescriptlang.org/docs/handbook/utility-types.html
