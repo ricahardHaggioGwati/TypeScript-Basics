@@ -13,16 +13,22 @@ function Logger(logString: string) {
 	};
 }
 
+
+// This verson of the code will ensure that the decorator will render the templet only after the class has been declared
 function withTamplet(templet: string, hookId: string) {
-	return function (constructor: any) {
-		// (_) tell typescript that they is a value but it isnt required
-		const hookEl = document.getElementById(hookId);
-		const p = new constructor();
-		console.log('Rendering'); // To see which decorator gets logged first
-		if (hookEl) {
-			hookEl.innerHTML = templet;
-			hookEl.querySelector('h1')!.textContent = p.name;
-		}
+	return function<T extends {new(...args: any[]): {name: string}}> (originalConstructor: T) {
+		return class extends originalConstructor {
+			constructor(..._: any[]) {
+				super();
+				// (_) tell typescript that they is a value but it isnt required
+				const hookEl = document.getElementById(hookId);
+				console.log('Rendering'); // To see which decorator gets logged first
+				if (hookEl) {
+					hookEl.innerHTML = templet;
+					hookEl.querySelector('h1')!.textContent = this.name;
+				}
+			}
+		};
 	};
 }
 
@@ -48,15 +54,15 @@ function log(target: any, propertyName: string) {//the number of arguments a dec
     console.log(target, propertyName)
 }
 
-// adding decorators to accessers. Recieves 3 arguments
+// adding decorators to accessers. Recieves 3 arguments. Can also return a value
 function log2(target: any, name: string, descriptor: PropertyDescriptor) {
     console.log('Accesser decorator!')
     console.log(target)
     console.log(name)
-    console.log(descriptor)
+    console.log(descriptor) 
 }
 
-// adding to a method
+// adding to a method. Can also return a value
 function log3(target: any, name: string, descriptor: PropertyDescriptor) {
     console.log('Method decorator!')
     console.log(target)
@@ -96,3 +102,33 @@ class Product {
 		return this._price * (1 + tax);
 	}
 }
+
+// Creating a decorator that auto binds this to the surrounding class
+
+function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value
+    const adjustedDescriptor: PropertyDescriptor = {
+        configurable: true,
+        enumerable: false,
+        get() {
+            const boundFn = originalMethod.bind(this)   // this will refer to whatever is responsible for teiggering the get method
+            return boundFn
+        }
+    }
+    return adjustedDescriptor
+}
+
+
+class Printer {
+    message = 'This works'
+
+    @AutoBind
+    showMessage() {
+        console.log(this.message)   
+    }
+}
+
+const p = new Printer
+
+const button = document.querySelector('button')!
+button.addEventListener('click', p.showMessage)
