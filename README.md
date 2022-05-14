@@ -25,6 +25,23 @@ npm install typescript
 Or visit the official website
 [TypeScript](https://www.typescriptlang.org/)
 
+### tsconfig.json:
+   
+    ```
+    {
+        "compilerOptions": {
+            "target": "es6",
+            "experimentalDecorators": true }
+    }
+    ```
+### Information about decorators
+
+#### Decorators
+
+A Decorator is a special kind of declaration that can be attached to a class declaration, method, accessor, property, or parameter. Decorators use the form @expression, where expression must evaluate to a function that will be called at runtime with information about the decorated declaration.
+
+For more imformation [TypeScript Decorators](https://www.typescriptlang.org/docs/handbook/decorators.html)
+
 ## Help
 
 I would be more trhan happy to help with any questions or issues about this repo.
