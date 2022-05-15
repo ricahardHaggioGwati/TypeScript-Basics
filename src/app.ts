@@ -13,7 +13,6 @@ function Logger(logString: string) {
 	};
 }
 
-
 // This verson of the code will ensure that the decorator will render the templet only after the class has been declared
 function withTamplet(templet: string, hookId: string) {
 	return function<T extends {new(...args: any[]): {name: string}}> (originalConstructor: T) {
@@ -118,7 +117,6 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
     return adjustedDescriptor
 }
 
-
 class Printer {
     message = 'This works'
 
@@ -132,3 +130,78 @@ const p = new Printer
 
 const button = document.querySelector('button')!
 button.addEventListener('click', p.showMessage)
+
+// Validation decorators
+
+interface ValidatorConfig {
+	[property: string]: {
+		[validatableProp: string]: string[]	//['required', 'positive']
+	}
+}
+
+const registeredValidators: ValidatorConfig = {}
+
+function Required(target: any, propName: string) {
+	registeredValidators[target.constructor.name] = {
+		...registeredValidators[target.constructor.name],	//ensures that the exisiting prop aren't over ridden
+		[propName]: ['required'] 	
+	}
+}
+
+function PositiveNumber(target: any, propName: string) {
+	registeredValidators[target.constructor.name] = {
+		[propName]: ['positive']
+	}
+}
+
+function validate(obj: any) {
+	const objValidatorConfig = registeredValidators[obj.constructor.name]
+	if (!objValidatorConfig) {
+		return true
+	}
+
+	let isValid = true
+	for (const prop in objValidatorConfig) {
+		for (const validator of objValidatorConfig[prop]) {
+			switch (validator) {	
+				case 'required':
+					isValid = isValid && !!obj[prop]		// !! converts value to a truthy value
+					break
+				case 'positive':
+					isValid = isValid && obj[prop] > 0
+					break
+			}
+		}
+	} 
+	return isValid
+}
+
+class Course {
+	@Required
+	title: string
+	@PositiveNumber
+	price: number
+
+	constructor(t: string, p: number) {
+		this.title = t
+		this.price = p
+	}
+}
+
+const courseForm = document.querySelector('form')!
+courseForm.addEventListener('submit', event => {
+	event.preventDefault()
+	const titleEl = document.getElementById('title') as HTMLInputElement
+	const priceEl = document.getElementById('price') as HTMLInputElement
+	
+	const title = titleEl.value
+	const price = +priceEl.value
+
+	const currentCourse = new Course(title, price)
+
+	if (!validate(currentCourse)) {
+		throw new Error('Inalid course')
+	}
+
+	console.log(currentCourse)
+})
